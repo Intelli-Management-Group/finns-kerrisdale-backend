@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\ImageUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +15,11 @@ class Brand extends Model
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'sort_order' => 'integer'];
+        return [
+            'logo_url' => ImageUrl::class,
+            'is_active' => 'boolean',
+            'sort_order' => 'integer',
+        ];
     }
 
     public function logo(): BelongsTo

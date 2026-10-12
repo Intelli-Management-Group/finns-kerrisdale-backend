@@ -18,4 +18,4 @@ Useful commands:
 
 To reset the admin login, run `php artisan admin:password` (or pass the admin email). The command defaults to `ADMIN_EMAIL` from `.env`; if that address is not an account, it uses the only active admin or asks you to choose when there are several. It asks for the new password twice without displaying it and requires at least 12 characters.
 
-The admin media API provides configured folders and their item counts at `GET /api/admin/media/folders`. Set `MEDIA_BASE_URL` to the public origin that the admin browser can reach when `APP_URL` is not that origin. Media files on the `public` disk are also served from `/storage/...` if the `public/storage` symlink is unavailable.
+The admin media API provides configured folders and their item counts at `GET /api/admin/media/folders`. Image references are stored as paths, while API responses build absolute URLs from `MEDIA_BASE_URL` (falling back to `ASSET_URL` and `APP_URL`). Set `MEDIA_BASE_URL` to the public origin that the admin browser can reach when `APP_URL` is not that origin. Media files on the `public` disk are also served from `/storage/...` if the `public/storage` symlink is unavailable.

@@ -99,7 +99,8 @@ class ImageUrlResolver
     /** True when the string is (or contains, as a URL/path) a reference this class can map. */
     public function isUploadReference(string $ref): bool
     {
-        return $this->extractUploadRelative($ref) !== null;
+        return $this->extractStorageMediaRelative($ref) !== null
+            || $this->extractUploadRelative($ref) !== null;
     }
 
     public function legacyHosts(): array
@@ -133,9 +134,22 @@ class ImageUrlResolver
 
         [$location, $suffix] = $this->splitSuffix($raw);
         $host = $this->hostOf($location);
+        $storageRelative = $this->extractStorageMediaRelative($location);
 
-        if ($host !== null && !$this->isLegacyHost($host) && !$this->isOwnHost($host)) {
+        if ($host !== null && !$this->isLegacyHost($host) && !$this->isOwnHost($host)
+            && !($storageRelative !== null && $this->isLocalHost($host))) {
             $result['status'] = self::EXTERNAL;
+            return $result;
+        }
+
+        if ($storageRelative !== null) {
+            $path = '/storage/uploads/' . implode('/', array_map('rawurlencode', explode('/', $storageRelative))) . $suffix;
+            $result['path'] = $path;
+            $result['url'] = $this->baseUrl . $path;
+            $result['status'] = ($host === null || $this->isOwnHost($host)) && $location === '/storage/uploads/' . $storageRelative
+                ? self::OK
+                : self::MAPPED;
+
             return $result;
         }
 
@@ -219,6 +233,17 @@ class ImageUrlResolver
         }
 
         return null;
+    }
+
+    private function extractStorageMediaRelative(string $location): ?string
+    {
+        if (str_starts_with($location, '//') || preg_match('#^[a-z][a-z0-9+.-]*://#i', $location)) {
+            $location = (string) parse_url(str_starts_with($location, '//') ? 'https:' . $location : $location, PHP_URL_PATH);
+        }
+
+        return preg_match('#^/storage/uploads/(.+)$#i', $location, $matches)
+            ? $this->cleanRelative($matches[1])
+            : null;
     }
 
     private function cleanRelative(string $rel): ?string
@@ -354,6 +379,11 @@ class ImageUrlResolver
         }
         $own = parse_url($this->baseUrl, PHP_URL_HOST);
         return $own !== null && strtolower($own) === $host;
+    }
+
+    private function isLocalHost(string $host): bool
+    {
+        return in_array($host, ['localhost', '127.0.0.1', '::1'], true);
     }
 
     private function log(string $level, string $message, array $context): void

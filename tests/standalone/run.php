@@ -36,7 +36,8 @@ check('query kept', $r->toPath('https://example.com/wp-content/uploads/2024/05/i
 check('resized variant', $r->toPath('/wp-content/uploads/2024/05/image-300x200.jpg'), '/uploads/2024/05/image.jpg');
 check('scaled', $r->toPath('/wp-content/uploads/2024/05/hero.jpg'), '/uploads/2024/05/hero-scaled.jpg');
 check('resized of scaled', $r->toPath('/wp-content/uploads/2024/05/hero-1024x683.jpg'), '/uploads/2024/05/hero-scaled.jpg');
-check('case + space', $r->toPath('/wp-content/uploads/2024/05/team%20photo.jpg'), '/uploads/2024/05/Team%20Photo.JPG');
+$caseMatch = PHP_OS_FAMILY === 'Windows' ? '/uploads/2024/05/team%20photo.jpg' : '/uploads/2024/05/Team%20Photo.JPG';
+check('case + space', $r->toPath('/wp-content/uploads/2024/05/team%20photo.jpg'), $caseMatch);
 check('fallback status', $r->inspect('/wp-content/uploads/2024/05/image-300x200.jpg')['status'], R::FALLBACK);
 // --- left alone / reported
 $miss = $r->inspect('https://example.com/wp-content/uploads/2022/01/gone.jpg');
@@ -49,7 +50,11 @@ check('data uri', $r->toPath('data:image/png;base64,AAAA'), 'data:image/png;base
 check('theme image unmappable', $r->inspect('https://example.com/wp-content/themes/x/hero.jpg')['status'], R::UNMAPPABLE);
 check('traversal blocked', $r->inspect('/uploads/../../.env')['status'], R::UNCHANGED);
 check('own host absolute ok', $r->inspect('https://new.test/uploads/2024/05/image.jpg')['status'], R::OK);
-if (posix_getuid() !== 0) check('unreadable', $r->inspect('/uploads/2024/05/locked.jpg')['status'], R::UNREADABLE);
+check('storage media path', $r->toPath('/storage/uploads/posts/2024/03/image.webp'), '/storage/uploads/posts/2024/03/image.webp');
+check('localhost storage media url', $r->toPath('http://localhost:8000/storage/uploads/posts/2024/03/image.webp'), '/storage/uploads/posts/2024/03/image.webp');
+check('dynamic storage media url', $r->toUrl('http://localhost:8000/storage/uploads/posts/2024/03/image.webp'), 'https://new.test/storage/uploads/posts/2024/03/image.webp');
+check('external storage url untouched', $r->toUrl('https://cdn.example.test/storage/uploads/posts/2024/03/image.webp'), 'https://cdn.example.test/storage/uploads/posts/2024/03/image.webp');
+if (function_exists('posix_getuid') && posix_getuid() !== 0) check('unreadable', $r->inspect('/uploads/2024/05/locked.jpg')['status'], R::UNREADABLE);
 check('null', $r->toPath(null), null);
 
 // --- rewriter
@@ -88,6 +93,13 @@ $st = array_count_values(array_column($w->lastReferences(), 'status'));
 check('scan sees missing', ($st[R::MISSING] ?? 0) >= 1, true);
 
 chmod("$pub/uploads/2024/05/locked.jpg", 0644);
-exec('rm -rf ' . escapeshellarg($pub));
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($pub, FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::CHILD_FIRST
+);
+foreach ($iterator as $item) {
+    $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+}
+rmdir($pub);
 echo ($n - $fail) . "/$n passed\n";
 exit($fail ? 1 : 0);

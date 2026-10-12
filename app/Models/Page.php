@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\ImageHtml;
+use App\Casts\ImageJson;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +24,8 @@ class Page extends Model
     protected function casts(): array
     {
         return [
-            'sections' => 'array',
+            'content' => ImageHtml::class,
+            'sections' => ImageJson::class,
             'published_at' => 'datetime',
             'noindex' => 'boolean',
             'menu_order' => 'integer',

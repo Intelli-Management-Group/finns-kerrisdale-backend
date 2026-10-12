@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\ImageHtml;
 use App\Support\Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,7 @@ class Post extends Model
     protected function casts(): array
     {
         return [
+            'content' => ImageHtml::class,
             'published_at' => 'datetime',
             'is_featured' => 'boolean',
             'noindex' => 'boolean',

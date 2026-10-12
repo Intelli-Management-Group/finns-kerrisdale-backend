@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Support\Media\ImageContentRewriter;
 use Illuminate\Support\Facades\Cache;
 
 class SettingsService
@@ -19,7 +20,7 @@ class SettingsService
             if ($publicOnly && ! $row['is_public']) {
                 continue;
             }
-            $out[$row['key']] = $row['value'];
+            $out[$row['key']] = $this->rewriteValue($row['value'], ImageContentRewriter::MODE_URL);
         }
 
         return $out;
@@ -35,7 +36,11 @@ class SettingsService
     {
         return Setting::query()->orderBy('group')->orderBy('id')->get()
             ->groupBy('group')
-            ->map(fn ($items) => $items->map(fn ($s) => ['key' => $s->key, 'value' => $s->value, 'is_public' => $s->is_public])->values())
+            ->map(fn ($items) => $items->map(fn ($s) => [
+                'key' => $s->key,
+                'value' => $this->rewriteValue($s->value, ImageContentRewriter::MODE_URL),
+                'is_public' => $s->is_public,
+            ])->values())
             ->toArray();
     }
 
@@ -45,7 +50,7 @@ class SettingsService
         foreach ($values as $key => $value) {
             $setting = Setting::query()->where('key', $key)->first();
             if ($setting) {
-                $setting->update(['value' => $value]);
+                $setting->update(['value' => $this->rewriteValue($value, ImageContentRewriter::MODE_PATH)]);
             }
         }
         $this->flush();
@@ -53,8 +58,26 @@ class SettingsService
 
     public function set(string $key, mixed $value, string $group = 'general', bool $public = true): void
     {
-        Setting::query()->updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group, 'is_public' => $public]);
+        Setting::query()->updateOrCreate(
+            ['key' => $key],
+            ['value' => $this->rewriteValue($value, ImageContentRewriter::MODE_PATH), 'group' => $group, 'is_public' => $public]
+        );
         $this->flush();
+    }
+
+    private function rewriteValue(mixed $value, string $mode): mixed
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->rewriteValue($item, $mode);
+            }
+
+            return $value;
+        }
+
+        return is_string($value)
+            ? app(ImageContentRewriter::class)->rewrite($value, $mode)
+            : $value;
     }
 
     public function flush(): void

@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Media;
+use App\Models\Page;
 use App\Models\Post;
+use App\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -101,6 +104,99 @@ class MediaTest extends TestCase
         $this->assertSame(
             'https://cdn.example.test/storage/uploads/general/image.webp',
             Media::urlFor('public', 'uploads/general/image.webp')
+        );
+    }
+
+    public function test_image_content_stores_paths_and_uses_the_current_media_base_url(): void
+    {
+        config(['media.base_url' => 'https://api.example.test']);
+        $post = Post::create([
+            'title' => 'Path-only image',
+            'slug' => 'path-only-image',
+            'content' => '<img src="http://localhost:8000/storage/uploads/posts/2024/03/image.webp">',
+            'status' => 'draft',
+        ]);
+
+        $this->assertSame(
+            '<img src="/storage/uploads/posts/2024/03/image.webp">',
+            DB::table('posts')->where('id', $post->id)->value('content')
+        );
+        $this->assertSame(
+            '<img src="https://api.example.test/storage/uploads/posts/2024/03/image.webp">',
+            $post->fresh()->content
+        );
+
+        $page = Page::create([
+            'title' => 'Image sections',
+            'slug' => 'image-sections',
+            'sections' => ['hero' => ['image' => 'http://localhost:8000/storage/uploads/pages/hero.webp']],
+        ]);
+        $this->assertSame(
+            ['hero' => ['image' => '/storage/uploads/pages/hero.webp']],
+            json_decode(DB::table('pages')->where('id', $page->id)->value('sections'), true)
+        );
+        $this->assertSame(
+            ['hero' => ['image' => 'https://api.example.test/storage/uploads/pages/hero.webp']],
+            $page->fresh()->sections
+        );
+    }
+
+    public function test_data_migration_normalizes_existing_localhost_image_references(): void
+    {
+        $post = Post::create(['title' => 'Legacy image', 'slug' => 'legacy-image', 'status' => 'draft']);
+        DB::table('posts')->where('id', $post->id)
+            ->update(['content' => '<img src="http://localhost:8000/storage/uploads/posts/legacy.webp">']);
+        $mediaId = DB::table('media')->insertGetId([
+            'disk' => 'public',
+            'folder' => 'posts',
+            'path' => 'http://localhost:8000/storage/uploads/posts/legacy.webp',
+            'filename' => 'legacy.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'variants' => json_encode(['thumb' => 'http://localhost:8000/storage/uploads/posts/legacy-thumb.webp']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('settings')->insert([
+            'key' => 'legacy_image',
+            'value' => json_encode(['image' => 'http://localhost:8000/storage/uploads/general/logo.webp']),
+            'group' => 'general',
+            'is_public' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $migration = require database_path('migrations/2026_10_12_000500_normalize_localhost_media_urls.php');
+        $migration->up();
+
+        $this->assertSame(
+            '<img src="/storage/uploads/posts/legacy.webp">',
+            DB::table('posts')->where('id', $post->id)->value('content')
+        );
+        $this->assertSame('uploads/posts/legacy.webp', DB::table('media')->where('id', $mediaId)->value('path'));
+        $this->assertSame(
+            ['thumb' => 'uploads/posts/legacy-thumb.webp'],
+            json_decode(DB::table('media')->where('id', $mediaId)->value('variants'), true)
+        );
+        $this->assertSame(
+            ['image' => '/storage/uploads/general/logo.webp'],
+            json_decode(DB::table('settings')->where('key', 'legacy_image')->value('value'), true)
+        );
+    }
+
+    public function test_settings_store_image_paths_and_return_dynamic_image_urls(): void
+    {
+        config(['media.base_url' => 'https://api.example.test']);
+        $settings = app(SettingsService::class);
+        $settings->set('logo_url', 'http://localhost:8000/storage/uploads/general/logo.webp');
+
+        $this->assertSame(
+            '/storage/uploads/general/logo.webp',
+            json_decode(DB::table('settings')->where('key', 'logo_url')->value('value'), true)
+        );
+        $this->assertSame(
+            'https://api.example.test/storage/uploads/general/logo.webp',
+            $settings->get('logo_url')
         );
     }
 
