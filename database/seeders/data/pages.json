@@ -1,0 +1,57 @@
+[
+  {
+    "wp_id": 6,
+    "title": "Home",
+    "slug": "home",
+    "template": "home",
+    "menu_order": 0,
+    "published_at": "2015-02-05 04:21:27",
+    "seo_title": "Home",
+    "seo_description": "Finns Kerrisdale Ladies is the grown child of the original Finns Kerrisdale Men and Women, opened in 1957 on West 41st Avenue. European labels, free alterations, special ordering and home delivery on West Boulevard, Vancouver.",
+    "content": "<div class=\"fkl-banner\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/banner_home_all.jpg\" alt=\"Finns Kerrisdale Ladies boutique\" width=\"1000\" height=\"386\"></div><div class=\"fkl-intro\"><p>Finns Kerrisdale Ladies is the grown child of the original Finns Kerrisdale Men and Women, which was opened in 1957 on West 41st Avenue. After offering the best in ladies and mens wear for 50 years the ladies only store was opened on West Boulevard and 38th Avenue in 2007.</p><p>Many ladies are still discovering this little gem on the boulevard…but while the address has changed the European labels have not, offering the best in quality of fabric, tailoring and timeless designs that investment dressing demands. The designers you will find include …LUISA CERANO, RIANI, CAMBIO, SAVE THE QUEEN, LAUREL, TWIN-SET. Customer service has not been forgotten, with free alterations, special ordering, and home delivery, not to mention a hot or cold drink and quarters for the parking meter.</p><p>Finns Kerrisdale Ladies is now the best kept secret on the west side.</p></div>"
+  },
+  {
+    "wp_id": 55,
+    "title": "About Us",
+    "slug": "about",
+    "template": "about",
+    "menu_order": 1,
+    "published_at": "2015-02-06 07:56:33",
+    "seo_title": null,
+    "seo_description": "Meet second generation owner Robin James and Patty Wu of Finns Kerrisdale Ladies, a personal shopping boutique on West Boulevard in Vancouver.",
+    "content": "<div class=\"fkl-row\"><div class=\"fkl-col-8\"><p class=\"fkl-title-img\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/AboutUs_title.png\" alt=\"About Us\" width=\"254\" height=\"62\"></p><div class=\"fkl-text\"><p>When you walk into the new Finns Kerrisdale Ladies, you will recognize the second generation owner, Robin James. After working in sales and buying at the original location for 20 years, Robin has reopened this business with a well cultivated love and passion for “serving her customer”. Developing a working relationship with her customer is what excites her most about her chosen profession — making the customer happy through her purchase is Robin’s personal challenge each and every day. She knows it is this intimacy that makes personal shopping as popular today as it was 40 years ago.</p><p>Aside from the people end of her business, Robin is simply blown away with the season after season year after year ability of the fashion industry to reinvent itself. This is a rich and creative industry attracting only the most gifted for success. The labels she sells will show you the best the industry has to offer.</p><p>Robin works along side her trusted Patty Wu, who has been with the company for 13 years — and who has an amazing ability to put pieces of clothing together that astounds even the most seasoned shopper. That and her talents for display give even another reason for a visit to the shop a must.</p></div><p class=\"fkl-center\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/FKL.png\" alt=\"FKL\" width=\"169\" height=\"76\"></p></div><div class=\"fkl-col-4\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/AboutUs_right.png\" alt=\"Inside Finns Kerrisdale Ladies\" width=\"356\" height=\"411\"></div></div>"
+  },
+  {
+    "wp_id": 73,
+    "title": "Designer",
+    "slug": "designer",
+    "template": "designer",
+    "menu_order": 2,
+    "published_at": "2015-02-06 08:42:41",
+    "seo_title": null,
+    "seo_description": "Luisa Cerano, Riani, Cambio, Save the Queen!, Laurel and Twin-Set in Vancouver at Finns Kerrisdale Ladies.",
+    "content": "<div class=\"fkl-row\"><div class=\"fkl-col-8\"><p class=\"fkl-title-img\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/Designers_title.png\" alt=\"Our Designers\" width=\"381\" height=\"76\"></p><div class=\"fkl-text\"><p>Luisa Cerano, Laurèl, Riani, Cambio, Save The Queen!, Twin-Set are part of our clothing lines.</p><p>Click on labels below to enter their web sites</p></div><div data-widget=\"brands\"></div></div><div class=\"fkl-col-4\"><img src=\"https://finnskerrisdaleladies.com/wp-content/themes/wp_nuvo/images/designer/designer_1.jpg\" alt=\"Luisa Cerano Designer Clothing Logo Banner\"></div></div>"
+  },
+  {
+    "wp_id": 10,
+    "title": "Blog",
+    "slug": "blog",
+    "template": "blog",
+    "menu_order": 3,
+    "published_at": "2015-02-05 04:26:42",
+    "seo_title": null,
+    "seo_description": "The best kept secret on the west side",
+    "content": ""
+  },
+  {
+    "wp_id": 31,
+    "title": "Contact Us",
+    "slug": "contact",
+    "template": "contact",
+    "menu_order": 4,
+    "published_at": "2015-02-06 04:58:10",
+    "seo_title": null,
+    "seo_description": "Visit Finns Kerrisdale Ladies at 5401 West Boulevard, Vancouver, BC. Phone (604) 266-8358. Open Tuesday to Saturday 10 – 5:30.",
+    "content": "<div class=\"fkl-row\"><div class=\"fkl-col-4\"><p class=\"fkl-title-img\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/ContactUs_title.png\" alt=\"Contact Us\" width=\"309\" height=\"60\"></p><div data-widget=\"contact-details\"></div><div data-widget=\"subscribe\"></div><div data-widget=\"map\"></div></div><div class=\"fkl-col-8\"><img src=\"https://finnskerrisdaleladies.com/wp-content/uploads/2015/02/contact_right.jpg\" alt=\"Finns Kerrisdale Ladies store\" width=\"750\" height=\"500\"></div></div>"
+  }
+]
