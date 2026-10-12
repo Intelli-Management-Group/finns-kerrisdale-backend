@@ -39,6 +39,11 @@ class Media extends Model
 
     public static function urlFor(string $disk, string $path): string
     {
+        $baseUrl = rtrim((string) config('media.base_url', ''), '/');
+        if ($disk === 'public' && $baseUrl !== '') {
+            return $baseUrl.'/storage/'.ltrim($path, '/');
+        }
+
         return Storage::disk($disk)->url($path);
     }
 

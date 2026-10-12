@@ -14,3 +14,8 @@ Useful commands:
 | `php artisan wp:import --uploads=PATH [--dry-run]` | Import the WordPress database and images |
 | `php artisan media:localize` | Copy images still linked from the old host into the media library |
 | `php artisan site:check` | Report broken images, old links and missing SEO data |
+| `php artisan admin:password [EMAIL]` | Reset an admin password with hidden prompts and revoke its API tokens |
+
+To reset the admin login, run `php artisan admin:password` (or pass the admin email). The command defaults to `ADMIN_EMAIL` from `.env`; if that address is not an account, it uses the only active admin or asks you to choose when there are several. It asks for the new password twice without displaying it and requires at least 12 characters.
+
+The admin media API provides configured folders and their item counts at `GET /api/admin/media/folders`. Set `MEDIA_BASE_URL` to the public origin that the admin browser can reach when `APP_URL` is not that origin. Media files on the `public` disk are also served from `/storage/...` if the `public/storage` symlink is unavailable.

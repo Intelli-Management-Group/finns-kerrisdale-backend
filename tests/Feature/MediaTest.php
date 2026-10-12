@@ -72,6 +72,38 @@ class MediaTest extends TestCase
         $this->getJson('/api/admin/media?missing_alt=1')->assertJsonPath('meta.total', 1);
     }
 
+    public function test_media_folders_endpoint_returns_all_folders_with_counts(): void
+    {
+        $this->actingAsAdmin();
+        $this->postJson('/api/admin/media', ['file' => $this->fakeJpeg(), 'folder' => 'posts'])->assertCreated();
+
+        $this->getJson('/api/admin/media/folders')
+            ->assertOk()
+            ->assertJsonPath('data.0.folder', 'pages')
+            ->assertJsonPath('data.0.count', 0)
+            ->assertJsonPath('data.1.folder', 'posts')
+            ->assertJsonPath('data.1.count', 1);
+    }
+
+    public function test_public_storage_url_serves_media_without_a_storage_symlink(): void
+    {
+        Storage::disk('public')->put('uploads/general/test.webp', 'test image content');
+
+        $this->get('/storage/uploads/general/test.webp')
+            ->assertOk()
+            ->assertStreamedContent('test image content');
+    }
+
+    public function test_public_media_urls_use_the_configured_media_base_url(): void
+    {
+        config(['media.base_url' => 'https://cdn.example.test/']);
+
+        $this->assertSame(
+            'https://cdn.example.test/storage/uploads/general/image.webp',
+            Media::urlFor('public', 'uploads/general/image.webp')
+        );
+    }
+
     public function test_in_use_image_is_protected_and_replace_keeps_links_working(): void
     {
         $this->actingAsAdmin();

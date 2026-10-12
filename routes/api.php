@@ -73,6 +73,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'active', 'throttle:admin'])
     Route::apiResource('galleries', Admin\GalleryController::class);
 
     // Media library
+    Route::get('media/folders', [Admin\MediaController::class, 'folders']);
     Route::post('media/{media}/replace', [Admin\MediaController::class, 'replace']);
     Route::apiResource('media', Admin\MediaController::class)->parameters(['media' => 'media']);
 

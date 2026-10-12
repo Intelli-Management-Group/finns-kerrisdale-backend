@@ -36,6 +36,20 @@ class MediaController extends Controller
         return ApiResponse::success(MediaResource::collection($page), 'Media retrieved successfully');
     }
 
+    public function folders(): JsonResponse
+    {
+        $counts = Media::query()
+            ->selectRaw('folder, COUNT(*) as media_count')
+            ->groupBy('folder')
+            ->pluck('media_count', 'folder');
+
+        $folders = collect(config('media.folders', []))
+            ->map(fn (string $folder) => ['folder' => $folder, 'count' => (int) $counts->get($folder, 0)])
+            ->values();
+
+        return ApiResponse::success($folders, 'Media folders retrieved successfully');
+    }
+
     public function store(MediaUploadRequest $request): JsonResponse
     {
         $files = $request->file('files') ?? [$request->file('file')];
