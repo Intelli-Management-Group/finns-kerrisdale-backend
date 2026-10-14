@@ -82,7 +82,7 @@ class Media extends Model
         foreach (Gallery::query()->where('cover_media_id', $this->id)->orWhereHas('media', fn ($q) => $q->where('media.id', $this->id))->get(['id', 'title']) as $g) {
             $uses[] = ['type' => 'gallery', 'id' => $g->id, 'title' => $g->title];
         }
-        foreach (Brand::query()->where('logo_media_id', $this->id)->get(['id', 'name']) as $b) {
+        foreach (Brand::query()->where('logo_media_id', $this->id)->orWhere('brand_thumbnail_media_id', $this->id)->get(['id', 'name']) as $b) {
             $uses[] = ['type' => 'brand', 'id' => $b->id, 'title' => $b->name];
         }
         if (\DB::table('post_media')->where('media_id', $this->id)->exists()) {

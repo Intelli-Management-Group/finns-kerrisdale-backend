@@ -16,7 +16,7 @@ class BrandController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Brand::query()->with('logo');
+        $query = Brand::query()->with(['logo', 'brandThumbnailMedia']);
         if ($request->boolean('all')) {
             return ApiResponse::success(BrandResource::collection($query->orderBy('sort_order')->get()), 'Brands retrieved successfully');
         }
@@ -32,12 +32,12 @@ class BrandController extends Controller
         $brand = Brand::create($data);
         ContentCache::bust();
 
-        return ApiResponse::created(new BrandResource($brand->load('logo')), 'Brand created successfully');
+        return ApiResponse::created(new BrandResource($brand->load(['logo', 'brandThumbnailMedia'])), 'Brand created successfully');
     }
 
     public function show(Brand $brand): JsonResponse
     {
-        return ApiResponse::success(new BrandResource($brand->load('logo')), 'Brand retrieved successfully');
+        return ApiResponse::success(new BrandResource($brand->load(['logo', 'brandThumbnailMedia'])), 'Brand retrieved successfully');
     }
 
     public function update(BrandRequest $request, Brand $brand): JsonResponse
@@ -51,7 +51,7 @@ class BrandController extends Controller
         $brand->update($data);
         ContentCache::bust();
 
-        return ApiResponse::success(new BrandResource($brand->load('logo')), 'Brand updated successfully');
+        return ApiResponse::success(new BrandResource($brand->load(['logo', 'brandThumbnailMedia'])), 'Brand updated successfully');
     }
 
     public function reorder(Request $request): JsonResponse

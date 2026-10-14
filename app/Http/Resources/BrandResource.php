@@ -16,6 +16,8 @@ class BrandResource extends JsonResource
             'slug' => $this->slug,
             'logo_media_id' => $this->logo_media_id,
             'logo_url' => $this->logoSrc(),
+            'brand_thumbnail_media_id' => $this->brand_thumbnail_media_id,
+            'brand_thumbnail_url' => $this->brandThumbnailSrc(),
             'website_url' => $this->website_url,
             'label' => $this->label,
             'description' => $this->description,

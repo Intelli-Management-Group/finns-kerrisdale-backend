@@ -20,6 +20,8 @@ class BrandRequest extends FormRequest
             'slug' => ['nullable', 'string', 'max:140', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
             'logo_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'logo_url' => ['nullable', 'string', 'max:255'],
+            'brand_thumbnail_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'brand_thumbnail_url' => ['nullable', 'string', 'max:255'],
             'website_url' => ['nullable', 'url', 'max:255'],
             'label' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],

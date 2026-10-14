@@ -132,7 +132,7 @@ class ContentController extends Controller
     public function brands(Request $request): JsonResponse
     {
         $data = ContentCache::remember('brands', fn () => ApiResponse::plain(BrandResource::collection(
-            Brand::with('logo')->where('is_active', true)->orderBy('sort_order')->get()
+            Brand::with(['logo', 'brandThumbnailMedia'])->where('is_active', true)->orderBy('sort_order')->get()
         )));
 
         return ApiResponse::success($data, 'Brands retrieved successfully');
@@ -162,7 +162,7 @@ class ContentController extends Controller
         return ContentCache::remember('page:'.$page->id, function () use ($request, $page) {
             $data = ApiResponse::plain(new PageResource($page->load(['featuredMedia', 'ogMedia'])));
             if ($page->template === 'designer') {
-                $data['brands'] = ApiResponse::plain(BrandResource::collection(Brand::with('logo')->where('is_active', true)->orderBy('sort_order')->get()));
+                $data['brands'] = ApiResponse::plain(BrandResource::collection(Brand::with(['logo', 'brandThumbnailMedia'])->where('is_active', true)->orderBy('sort_order')->get()));
             }
             if ($page->template === 'home') {
                 $data['latest_posts'] = ApiResponse::plain(PostListResource::collection(Post::published()->latest('published_at')->limit(3)->get()));

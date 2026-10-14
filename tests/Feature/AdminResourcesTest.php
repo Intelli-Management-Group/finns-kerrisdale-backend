@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Page;
+use App\Models\Media;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,10 +37,33 @@ class AdminResourcesTest extends TestCase
         $tag = $this->postJson('/api/admin/tags', ['name' => 'Spring 24'])->assertCreated()->json('data.id');
         $this->deleteJson("/api/admin/tags/$tag")->assertOk();
 
-        $b1 = $this->postJson('/api/admin/brands', ['name' => 'Riani', 'website_url' => 'https://riani.de'])->assertCreated()->json('data.id');
+        $thumbnail = Media::create([
+            'disk' => 'public',
+            'folder' => 'brands',
+            'path' => 'uploads/brands/riani.webp',
+            'filename' => 'riani.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+        ]);
+        $b1 = $this->postJson('/api/admin/brands', [
+            'name' => 'Riani',
+            'website_url' => 'https://riani.de',
+            'brand_thumbnail_media_id' => $thumbnail->id,
+        ])->assertCreated()
+            ->assertJsonPath('data.brand_thumbnail_media_id', $thumbnail->id)
+            ->assertJsonPath('data.brand_thumbnail_url', $thumbnail->url)
+            ->json('data.id');
         $b2 = $this->postJson('/api/admin/brands', ['name' => 'Cambio'])->assertCreated()->json('data.id');
         $this->putJson('/api/admin/brands/order', ['ids' => [$b2, $b1]])->assertOk();
-        $this->getJson('/api/admin/brands?all=1')->assertJsonPath('data.0.name', 'Cambio');
+        $this->getJson('/api/admin/brands?all=1')
+            ->assertJsonPath('data.0.name', 'Cambio')
+            ->assertJsonPath('data.0.brand_thumbnail_media_id', null)
+            ->assertJsonPath('data.0.brand_thumbnail_url', null)
+            ->assertJsonPath('data.1.brand_thumbnail_media_id', $thumbnail->id)
+            ->assertJsonPath('data.1.brand_thumbnail_url', $thumbnail->url);
+        $this->getJson("/api/admin/brands/$b1")
+            ->assertJsonPath('data.brand_thumbnail_media_id', $thumbnail->id)
+            ->assertJsonPath('data.brand_thumbnail_url', $thumbnail->url);
 
         $g = $this->postJson('/api/admin/galleries', ['title' => 'Spring Windows', 'status' => 'published'])->assertCreated()->json('data.id');
         $this->getJson("/api/admin/galleries/$g")->assertOk()->assertJsonPath('data.slug', 'spring-windows');
