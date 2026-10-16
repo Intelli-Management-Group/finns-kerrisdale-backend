@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public API  (/api/public/*)  — read-only, cached, used by the React website
+| Public API  (/api/public/*)  — read-only, cached, used by the React websites
 |--------------------------------------------------------------------------
 */
 Route::prefix('public')->middleware('throttle:api')->group(function () {
