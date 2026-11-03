@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Support\ApiResponse;
+use App\Support\WordPressPassword;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -17,8 +18,16 @@ class AuthController extends Controller
     {
         $user = User::query()->where('email', strtolower($request->string('email')))->first();
 
-        if (! $user || ! Hash::check($request->string('password'), $user->password)) {
+        $password = (string) $request->input('password');
+        $stored = $user ? (string) $user->getRawOriginal('password') : '';
+
+        if (! $user || ! WordPressPassword::check($password, $stored)) {
             return ApiResponse::error('These credentials do not match our records.', 401);
+        }
+
+        // Upgrade WordPress (phpass/MD5/$wp$) hashes to Laravel bcrypt on first successful login.
+        if (WordPressPassword::needsRehash($stored)) {
+            $user->forceFill(['password' => Hash::make($password)])->saveQuietly();
         }
         if (! $user->is_active) {
             return ApiResponse::error('This account has been disabled.', 403);
