@@ -7,7 +7,7 @@
 
 $origins = array_values(array_filter(array_map('trim', array_merge(
     explode(',', (string) env('FRONTEND_URL', 'https://finnskerrisdaleladies.com')),
-    explode(',', (string) env('ADMIN_URL', 'http://finnskerrisdaleladies-admin.intelligrp.com')),
+    explode(',', (string) env('ADMIN_URL', 'https://admin.finnskerrisdaleladies.com/')),
     explode(',', (string) env('CORS_EXTRA_ORIGINS', '')),
 ))));
 
