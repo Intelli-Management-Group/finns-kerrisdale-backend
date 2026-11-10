@@ -41,10 +41,10 @@ class SubscriberController extends Controller
     {
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['email', 'status', 'source', 'subscribed_at', 'confirmed_at', 'unsubscribed_at']);
+            fputcsv($out, ['email', 'status', 'source', 'subscribed_at', 'confirmed_at', 'unsubscribed_at'], escape: '');
             Subscriber::query()->orderBy('id')->chunk(500, function ($rows) use ($out) {
                 foreach ($rows as $s) {
-                    fputcsv($out, [$s->email, $s->status, $s->source, $s->created_at, $s->confirmed_at, $s->unsubscribed_at]);
+                    fputcsv($out, [$s->email, $s->status, $s->source, $s->created_at, $s->confirmed_at, $s->unsubscribed_at], escape: '');
                 }
             });
             fclose($out);

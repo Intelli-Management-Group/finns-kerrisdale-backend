@@ -283,9 +283,9 @@ class MediaAudit extends Command
         $path = str_starts_with($path, '/') ? $path : base_path($path);
         @mkdir(dirname($path), 0775, true);
         $fh = fopen($path, 'w');
-        fputcsv($fh, ['source', 'location', 'reference', 'status', 'resolved_path', 'proposed', 'note']);
+        fputcsv($fh, ['source', 'location', 'reference', 'status', 'resolved_path', 'proposed', 'note'], escape: '');
         foreach ($this->rows as $row) {
-            fputcsv($fh, $row);
+            fputcsv($fh, $row, escape: '');
         }
         fclose($fh);
         $this->line("Report written to <info>{$path}</info>");
