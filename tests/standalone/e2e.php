@@ -84,14 +84,15 @@ foreach ($refs as $ref) {
     $url = $r->toUrl($ref);
     $ctx = stream_context_create(['http' => ['ignore_errors' => true, 'proxy' => '']]);
     $body = @file_get_contents($url, false, $ctx);
-    $code = isset($http_response_header[0]) ? (int) explode(' ', $http_response_header[0])[1] : 0;
-    $type = implode('', preg_grep('/^Content-Type/i', $http_response_header ?? []));
+    $headers = http_get_last_response_headers() ?? [];
+    $code = isset($headers[0]) ? (int) explode(' ', $headers[0])[1] : 0;
+    $type = implode('', preg_grep('/^Content-Type/i', $headers));
     printf("  %d %-45s <- %s\n", $code, $url, $ref);
     ok("http 200 $ref", $code === 200 && stripos($type, 'image/jpeg') !== false);
 }
 $missingUrl = "http://127.0.0.1:$port" . $r->inspect('https://example.com/wp-content/uploads/2021/02/missing.png')['proposed'];
 @file_get_contents($missingUrl, false, stream_context_create(['http' => ['ignore_errors' => true]]));
-printf("  %s %s (missing file stays a visible 404)\n", explode(' ', $http_response_header[0])[1], $missingUrl);
+printf("  %s %s (missing file stays a visible 404)\n", explode(' ', http_get_last_response_headers()[0])[1], $missingUrl);
 proc_terminate($proc);
 
 exec('rm -rf ' . escapeshellarg($root));
